@@ -86,4 +86,4 @@ dat %>% group_by(`Marital status`) %>% ggplot(aes(x=`Highest year of school comp
 
 ```
 
-Answer: People who responded with no answwer have the highest medina yeas of education. Widows have the on average the lowest years of education.
+Answer: People who responded with no answer have the highest median yeas of education. Widows have the on average the lowest years of education.
