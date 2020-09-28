@@ -1,0 +1,89 @@
+---
+title: "Individual1"
+author: "Armando Castillo"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I decided to do the lab by myself
+
+Importing data and reorganizing it 
+```{r}
+dat <- readxl::read_xls('C:/Users/Arman/ds202_lab3/GSS.xls')
+View(dat)
+library(ggplot2)
+library(tidyverse)
+
+dat$`Highest year of school completed` <- as.numeric(dat$`Highest year of school completed`)
+dat <- na.omit(dat)
+head(dat)
+```
+
+1. Find the average years of education for the respondents with each political party affiliation. Arrange your output in a meaningful order and print. Describe any patterns you find.
+
+```{r}
+
+edu_pol <- dat %>% group_by(`Political party affiliation`) %>% dplyr::summarise(Mean=mean(`Highest year of school completed`, na.rm=TRUE)) %>% arrange(Mean)
+edu_pol
+ggplot(dat, aes(x=reorder(`Political party affiliation`, `Highest year of school completed`, FUN = median), y=`Highest year of school completed`)) + geom_boxplot(alpha = 0) + theme(axis.text.x = element_text(angle = 45, hjust = 1)) + xlab('Political party')
+
+```
+
+Answer: Looks like strong republicans are the most educated , with no answer and don't know being the least educated. Also Other party seems to fair very well being 2nd most educated with str democrats being in the middle.
+
+
+2. Create a single data frame containing records for the better educated respondents in each political party affiliation. A “better educated” respondent is someone who has strictly more years of education than the median in the same party affiliation. Print the structure of the data frame
+
+```{r}
+best_edu <- data.frame()
+best_edu <- dat %>% group_by(`Political party affiliation`) %>% filter(`Highest year of school completed` > median(`Highest year of school completed`, na.rm=TRUE))
+
+more_edu <- nrow(best_edu) / nrow(dat)
+more_edu
+
+
+```
+
+Answer: It says that about 43.07131% have a greater education that theier affiliated political party
+
+3. How is the happiness of a respondent related to his/her marriage status? Define that a person is happy if the response to question is “Very happy” or “Pretty happy”.
+
+```{r}
+
+ggplot(dat, aes(x=`Marital status`, fill=`General happiness`)) + geom_bar() + coord_flip() + ggtitle("Happiness, Marital Status, and Political Party") + theme(axis.text.x = element_text(angle = 90))
+dat%>%
+  select(`General happiness`, `Political party affiliation`, `Marital status`)%>%
+  group_by(`Political party affiliation`, `Marital status`)%>%
+  count(`General happiness`)
+
+```
+
+Answer: Most people whom are Very happy and pretty happy are ones whom are married. The next group would be the never married group they have a lot of pretty happy people.
+
+4. Does party affiliation affect the relationship you found in the last question?
+
+```{r}
+
+ggplot(dat, aes(x=`Marital status`, fill=`General happiness`)) + geom_bar() + facet_wrap(~`Political party affiliation`, scales="free_x")+coord_flip() + ggtitle("Happiness, Marital Status, and Political Party") + theme(axis.text.x = element_text(angle = 90))
+dat%>%
+  select(`General happiness`, `Political party affiliation`, `Marital status`)%>%
+  group_by(`Political party affiliation`, `Marital status`)%>%
+  count(`General happiness`)
+```
+
+Answer: Political party does not seem to affect level happiness very much as there is a decently equal distribution among all political parties.
+
+5. How is marital status related to the education of a respondent? What are possible reasons accounting for the patterns you see?
+
+```{r}
+dat %>% group_by(`Marital status`) %>% ggplot(aes(x=`Highest year of school completed`)) + geom_boxplot() + facet_grid(~`Marital status`,)+ coord_flip()+
+  xlab('years of education') + theme(axis.text.x = element_blank(),axis.ticks.x  = element_blank()) + 
+  ggtitle('Education by Marital Status')
+
+
+```
+
+Answer: People who responded with no answwer have the highest medina yeas of education. Widows have the on average the lowest years of education.
